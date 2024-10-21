@@ -1,0 +1,13 @@
+.next
+.cache
+package.json
+package-lock.json
+/assets/*
+node_modules
+next-env.d.ts
+next.config.js
+yarn.lock
+.env
+.env.example
+/components/ui/*
+**/components/ui/*

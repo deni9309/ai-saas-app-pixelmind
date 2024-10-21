@@ -1,1 +1,1 @@
-# PixelMind - AI Image Editing Platform
+# PixelMind - AI-powered Image Generator
