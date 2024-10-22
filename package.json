@@ -11,7 +11,7 @@
     "prettier:check": "prettier --check \"**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.7.5",
+    "@clerk/nextjs": "^4.29.6",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
