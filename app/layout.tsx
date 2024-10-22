@@ -11,7 +11,7 @@ const IBMPlex = IBM_Plex_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'PixelMind',
+  title: 'PixelMind | AI Image Generator',
   description: 'AI-powered Image Generator',
 }
 
