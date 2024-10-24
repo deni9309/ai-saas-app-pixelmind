@@ -1,4 +1,3 @@
-
 const AddTransformationTypePage = () => {
   return <div>AddTransformationTypePage</div>
 }

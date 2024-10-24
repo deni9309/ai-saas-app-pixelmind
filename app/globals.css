@@ -337,6 +337,10 @@
     @apply p-16-semibold flex size-full gap-4 py-3.5 px-4;
   }
 
+  .sidebar-link_right {
+    @apply p-16-semibold flex size-full gap-2 py-3 px-4 cursor-pointer transition hover:bg-purple-100 hover:shadow-inner rounded-full;
+  }
+
   /* TransformationForm Component */
   .prompt-field {
     @apply flex flex-col gap-5 lg:flex-row lg:gap-10;

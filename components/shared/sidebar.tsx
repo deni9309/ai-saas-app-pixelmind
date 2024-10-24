@@ -20,7 +20,7 @@ const Sidebar = () => {
             src="/assets/images/pixel-mind-logo.svg"
             priority
             alt="PixelMind"
-            width={135}
+            width={134}
             height={48}
           />
         </Link>
