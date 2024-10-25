@@ -1,6 +1,158 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import qs from 'qs'
+
+import { aspectRatioOptions } from '@/constants'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+/**
+ * Handles an error by logging its message and re-throwing it with additional context.
+ *
+ * @param error - The error to handle, which can be of any type.
+ *                 If the error is an instance of `Error`, its message will be logged.
+ *                 If the error is a string, it will be logged directly.
+ *                 For other types, the error will be stringified and logged.
+ * @throws A new `Error` with a prefixed message describing the original error.
+ */
+export const handleError = (error: unknown) => {
+  if (error instanceof Error) {
+    // Native JS error (e.g., TypeError, RangeError)
+    console.error(error.message)
+    throw new Error('Error: ' + error.message)
+  } else if (typeof error === 'string') {
+    console.error(error)
+    throw new Error('Error: ' + error)
+  } else {
+    console.error(error)
+    throw new Error('Unknown error: ' + JSON.stringify(error))
+  }
+}
+
+/**
+ * Generates a shimmering SVG string that can be used as a placeholder for an image
+ * of the given width and height.
+ *
+ * The shimmering effect is a subtle gradient that moves from left to right.
+ *
+ * @param w - The width of the image.
+ * @param h - The height of the image.
+ * @returns A string of SVG that can be used as a placeholder.
+ */
+const shimmer = (w: number, h: number) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#7986AC" offset="20%" />
+      <stop stop-color="#68769e" offset="50%" />
+      <stop stop-color="#7986AC" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#7986AC" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`
+
+/**
+ * Encodes a given string to a base64 string.
+ *
+ * If the function is invoked in a Node.js environment, it will use the
+ * `Buffer.from(str).toString('base64')` method to encode the string.
+ *
+ * If the function is invoked in a browser environment, it will use the
+ * `window.btoa(str)` method to encode the string.
+ *
+ * @param str - The string to be encoded.
+ * @returns The base64 encoded string.
+ */
+const toBase64 = (str: string) =>
+  typeof window === 'undefined' ? Buffer.from(str).toString('base64') : window.btoa(str)
+
+export const dataUrl = `data:image/svg+xml;base64,${toBase64(shimmer(1000, 1000))}`
+
+/**
+ * Given a URLSearchParams object, a key, and a value, returns a new URL by
+ * adding the key/value pair to the search parameters.
+ *
+ * @param searchParams - The URLSearchParams object.
+ * @param key - The key to be added to the search parameters.
+ * @param value - The value associated with the key.
+ * @returns A new URL with the updated search parameters.
+ */
+export const formUrlQuery = ({ searchParams, key, value }: FormUrlQueryParams) => {
+  const params = { ...qs.parse(searchParams.toString()), [key]: value }
+
+  return `${window.location.pathname}?${qs.stringify(params, { skipNulls: true })}`
+}
+
+/**
+ * Given a URLSearchParams object and an array of keys, returns a new URL by
+ * removing the key/value pairs from the search parameters.
+ *
+ * @param searchParams - The URLSearchParams object.
+ * @param keysToRemove - The array of keys to be removed from the search parameters.
+ * @returns A new URL with the updated search parameters.
+ */
+export function removeKeysFromQuery({ searchParams, keysToRemove }: RemoveUrlQueryParams) {
+  const currentUrl = qs.parse(searchParams)
+
+  keysToRemove.forEach((key) => {
+    delete currentUrl[key]
+  })
+
+  Object.keys(currentUrl).forEach((key) => currentUrl[key] == null && delete currentUrl[key])
+
+  return `${window.location.pathname}?${qs.stringify(currentUrl)}`
+}
+
+/**
+ * Creates a debounced version of a function that delays invoking `func` until after
+ * `delay` milliseconds have elapsed since the last time the debounced function was
+ * invoked.
+ *
+ * @param func - The function to debounce.
+ * @param delay - The number of milliseconds to delay.
+ * @returns A debounced version of `func`.
+ */
+export const debounce = (func: (...args: unknown[]) => void, delay: number) => {
+  let timeoutId: NodeJS.Timeout | null
+
+  return (...args: unknown[]) => {
+    if (timeoutId) clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => func(...args), delay)
+  }
+}
+
+export type AspectRatioKey = keyof typeof aspectRatioOptions
+
+/**
+ * Given a type, an image object, and a dimension, returns the size of the image in that dimension.
+ *
+ * If the type is 'fill', the function uses the aspectRatioOptions object to determine the size of the image.
+ * If the image object has an aspectRatio that matches a key in the aspectRatioOptions object,
+ * the function returns the value of that key. Otherwise, the function returns 1000.
+ *
+ * If the type is not 'fill', the function returns the value of the dimension property of the image object.
+ * If the image object does not have the dimension property, the function returns 1000.
+ *
+ * @param type - The type of image.
+ * @param image - The image object.
+ * @param dimension - The dimension of the image to get the size of.
+ * @returns The size of the image in the given dimension.
+ */
+export const getImageSize = (
+  type: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  image: any,
+  dimesnsion: 'width' | 'height',
+): number => {
+  if (type === 'fill') {
+    return aspectRatioOptions[image.aspectRatio as AspectRatioKey]?.[dimesnsion] || 1000
+  }
+
+  return image?.[dimesnsion] || 1000
+}
+
+
