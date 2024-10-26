@@ -184,7 +184,6 @@ export const download = (url: string, filename: string) => {
     .catch((error) => console.error({ error }))
 }
 
-
 /**
  * Recursively merges two objects into a new object. If the two objects have any
  * properties with the same name, the property from the second object will be

@@ -95,7 +95,7 @@ export async function deleteUser(clerkId: string): Promise<IUser | null> {
 
     if (deletedUser) {
       revalidatePath('/')
-      
+
       return JSON.parse(JSON.stringify(deletedUser))
     }
   } catch (error) {
