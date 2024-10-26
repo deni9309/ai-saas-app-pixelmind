@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import qs from 'qs'
@@ -155,4 +156,72 @@ export const getImageSize = (
   return image?.[dimesnsion] || 1000
 }
 
+/**
+ * Downloads a resource from the provided URL and saves it to the user's machine.
+ * If a filename is provided, it will be used as the name of the downloaded file.
+ * If no filename is provided, the downloaded file will be named `image.png`.
+ *
+ * @param url - The URL of the resource to download.
+ * @param filename - The filename to use for the downloaded file.
+ */
+export const download = (url: string, filename: string) => {
+  if (!url) throw new Error('Resource URL not provided! Please, provide a valid URL.')
 
+  fetch(url)
+    .then((res) => res.blob())
+    .then((blob) => {
+      const blobUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = blobUrl
+
+      if (filename && filename.length) {
+        a.download = `${filename.replace(' ', '_')}.png`
+      }
+
+      document.body.appendChild(a)
+      a.click()
+    })
+    .catch((error) => console.error({ error }))
+}
+
+
+/**
+ * Recursively merges two objects into a new object. If the two objects have any
+ * properties with the same name, the property from the second object will be
+ * used in the resulting object.
+ *
+ * @param obj1 - The first object to be merged.
+ * @param obj2 - The second object to be merged.
+ *
+ * @returns A new object that contains all of the properties from both obj1 and
+ * obj2, with the properties from obj2 taking precedence in case of a conflict.
+ */
+export const deepMergeObjects = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  obj1: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  obj2: any,
+) => {
+  if (obj2 === null || obj2 === undefined) {
+    return obj1
+  }
+
+  let output = { ...obj2 }
+
+  for (let key in obj1) {
+    if (obj1.hasOwnProperty(key)) {
+      if (
+        obj1[key] &&
+        typeof obj1[key] === 'object' &&
+        obj2[key] &&
+        typeof obj2[key] === 'object'
+      ) {
+        output[key] = deepMergeObjects(obj1[key], obj2[key])
+      } else {
+        output[key] = obj1[key]
+      }
+    }
+  }
+
+  return output
+}
