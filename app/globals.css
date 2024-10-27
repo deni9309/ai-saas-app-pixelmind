@@ -338,7 +338,7 @@
   }
 
   .sidebar-link_right {
-    @apply p-16-semibold flex size-full gap-2 py-3 px-4 cursor-pointer transition hover:bg-purple-100 hover:shadow-inner rounded-full;
+    @apply p-16-semibold flex size-full gap-2 py-3 px-3 cursor-pointer transition hover:bg-purple-100 hover:shadow-inner rounded-full;
   }
 
   /* TransformationForm Component */

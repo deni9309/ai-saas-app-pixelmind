@@ -55,9 +55,10 @@ const MobileNav = () => {
 
                 <Image
                   src="/assets/images/pixel-mind-logo.svg"
-                  width={134}
-                  height={48}
+                  width={375}
+                  height={135}
                   alt="PixelMind"
+                  className="w-10/12 pl-2"
                 />
                 <ul className="header-nav_elements">
                   {navLinks.map((link) => {
@@ -72,7 +73,13 @@ const MobileNav = () => {
                         )}
                       >
                         <Link prefetch className="sidebar-link_right" href={link.route}>
-                          <Image src={link.icon} alt="logo" width={18} height={18} />
+                          <Image
+                            src={link.icon}
+                            alt="logo"
+                            width={20}
+                            height={20}
+                            className="size-5"
+                          />
                           {link.label}
                         </Link>
                       </li>
