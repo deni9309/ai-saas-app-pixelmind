@@ -128,6 +128,8 @@ export const debounce = (func: (...args: unknown[]) => void, delay: number) => {
 
 export type AspectRatioKey = keyof typeof aspectRatioOptions
 
+export type AspectRatioType = typeof aspectRatioOptions
+
 /**
  * Given a type, an image object, and a dimension, returns the size of the image in that dimension.
  *
