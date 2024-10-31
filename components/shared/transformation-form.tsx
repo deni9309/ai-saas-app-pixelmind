@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -8,15 +8,7 @@ import { useRouter } from 'next/navigation'
 import { getCldImageUrl } from 'next-cloudinary'
 
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -25,17 +17,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import CustomInputField from '@/components/shared/custom-input-field'
+import MediaUploader from '@/components/shared/media-uploader'
 import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
-import { TransformationSchema } from '@/schemas/transformation.schema'
-import { title } from 'process'
-import TransformationInputField from './transformation-input-field'
 import { AspectRatioKey, AspectRatioType, debounce, deepMergeObjects } from '@/lib/utils'
+import { TransformationSchema } from '@/schemas/transformation.schema'
 
 const TransformationForm = ({
   action,
   data = null,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   userId,
   type,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   creditBalance,
   config = null,
 }: TransformationFormProps) => {
@@ -46,8 +40,11 @@ const TransformationForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isTransforming, setIsTransforming] = useState(false)
   const [transformationConfig, setTransformationConfig] = useState(config)
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isPending, startTransition] = useTransition()
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter()
 
   const initialValues =
@@ -77,6 +74,7 @@ const TransformationForm = ({
         ...transformationConfig,
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const imageData = {
         title: values.title,
         publicId: image?.publicId,
@@ -150,7 +148,7 @@ const TransformationForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <TransformationInputField
+        <CustomInputField
           control={form.control}
           render={({ field }) => <Input id={field.name} {...field} className="input-field" />}
           name="title"
@@ -159,8 +157,11 @@ const TransformationForm = ({
         />
 
         {type === 'fill' && (
-          <TransformationInputField
+          <CustomInputField
             control={form.control}
+            name="aspectRatio"
+            className="w-full"
+            formLabel="Aspect Ratio"
             render={({ field }) => (
               <Select onValueChange={(value) => onSelectFieldHandler(value, field.onChange)}>
                 <FormControl id={field.name}>
@@ -177,15 +178,12 @@ const TransformationForm = ({
                 </SelectContent>
               </Select>
             )}
-            name="aspectRatio"
-            className="w-full"
-            formLabel="Aspect Ratio"
           />
         )}
 
         {(type === 'remove' || type === 'recolor') && (
           <div className="prompt-field">
-            <TransformationInputField
+            <CustomInputField
               control={form.control}
               name="prompt"
               formLabel={type === 'remove' ? 'Object to Remove' : 'Object to Recolor'}
@@ -203,7 +201,7 @@ const TransformationForm = ({
             />
 
             {type === 'recolor' && (
-              <TransformationInputField
+              <CustomInputField
                 control={form.control}
                 name="color"
                 formLabel="Replacement Color"
@@ -222,6 +220,23 @@ const TransformationForm = ({
             )}
           </div>
         )}
+
+        <div className="media-uploader-field">
+          <CustomInputField
+            control={form.control}
+            name="publicId"
+            className="flex size-full flex-col"
+            render={({ field }) => (
+              <MediaUploader
+                onValueChange={field.onChange}
+                setImage={setImage}
+                publicId={field.value!}
+                image={image}
+                type={type}
+              />
+            )}
+          />
+        </div>
 
         <div className="flex flex-col gap-4">
           <Button

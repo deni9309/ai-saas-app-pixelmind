@@ -28,7 +28,7 @@
     "mongodb": "^6.10.0",
     "mongoose": "^8.7.2",
     "next": "14.2.15",
-    "next-cloudinary": "^6.15.0",
+    "next-cloudinary": "^5.20.0",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "qs": "^6.13.0",

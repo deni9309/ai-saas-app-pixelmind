@@ -210,6 +210,7 @@ export const deepMergeObjects = (
   let output = { ...obj2 }
 
   for (let key in obj1) {
+    // eslint-disable-next-line no-prototype-builtins
     if (obj1.hasOwnProperty(key)) {
       if (
         obj1[key] &&

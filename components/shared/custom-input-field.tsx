@@ -5,7 +5,7 @@ import { Control, ControllerRenderProps } from 'react-hook-form'
 import { TransformationSchema } from '@/schemas/transformation.schema'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
-type TransformationInputFieldProps = {
+type CustomInputFieldProps = {
   control: Control<z.infer<typeof TransformationSchema>> | undefined
   render: (props: {
     field: ControllerRenderProps<z.infer<typeof TransformationSchema>>
@@ -15,26 +15,22 @@ type TransformationInputFieldProps = {
   className?: string
 }
 
-const TransformationInputField = ({
+const CustomInputField = ({
   control,
   render,
   name,
   formLabel,
   className,
-}: TransformationInputFieldProps) => {
+}: CustomInputFieldProps) => {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
         <FormItem className={className}>
-          {formLabel &&
-            <FormLabel htmlFor={field.name}>{formLabel}</FormLabel>
-          }
-          
-          <FormControl id={field.name}>
-            {render({ field })}
-          </FormControl>
+          {formLabel && <FormLabel htmlFor={field.name}>{formLabel}</FormLabel>}
+
+          <FormControl id={field.name}>{render({ field })}</FormControl>
           <FormMessage />
         </FormItem>
       )}
@@ -42,4 +38,4 @@ const TransformationInputField = ({
   )
 }
 
-export default TransformationInputField
+export default CustomInputField
