@@ -10,17 +10,20 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Handles an error by logging its message and re-throwing it with additional context.
+ * Logs the given error and then throws it.
  *
- * @param error - The error to handle, which can be of any type.
- *                 If the error is an instance of `Error`, its message will be logged.
- *                 If the error is a string, it will be logged directly.
- *                 For other types, the error will be stringified and logged.
- * @throws A new `Error` with a prefixed message describing the original error.
+ * If the error is a native JS error (e.g., TypeError, RangeError), the error message is logged
+ * and then the error is thrown with a prefix of 'Error: '.
+ *
+ * If the error is a string, it is logged and then thrown with a prefix of 'Error: '.
+ *
+ * If the error is anything else, it is logged and then thrown with a prefix of 'Unknown error: '.
+ *
+ * @param error - The error to log and throw.
+ * @throws The given error.
  */
-export const handleError = (error: unknown) => {
+export const handleError = (error: Error | string | unknown): never => {
   if (error instanceof Error) {
-    // Native JS error (e.g., TypeError, RangeError)
     console.error(error.message)
     throw new Error('Error: ' + error.message)
   } else if (typeof error === 'string') {

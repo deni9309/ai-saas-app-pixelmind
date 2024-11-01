@@ -21,6 +21,23 @@ export interface IImage extends Document {
   updatedAt?: Date
 }
 
+export interface IImageLean extends Document {
+  title: string
+  transformationType: string
+  publicId: string
+  secureUrl: string
+  width?: number
+  height?: number
+  config?: object
+  transformationUrl?: string
+  aspectRatio?: string
+  color?: string
+  prompt?: string
+  author: string
+  createdAt?: Date
+  updatedAt?: Date
+}
+
 const ImageSchema = new Schema({
   title: { type: String, required: true },
   transformationType: { type: String, required: true },

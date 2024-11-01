@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 
 // ====== USER PARAMS
@@ -25,10 +26,9 @@ declare type AddImageParams = {
     transformationType: string
     width: number
     height: number
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config: any
-    secureURL: string
-    transformationURL: string
+    secureUrl: string
+    transformationUrl: string
     aspectRatio: string | undefined
     prompt: string | undefined
     color: string | undefined
@@ -37,22 +37,23 @@ declare type AddImageParams = {
   path: string
 }
 
+declare type ImageType = {
+  _id: string
+  title: string
+  publicId: string
+  transformationType: string
+  width: number
+  height: number
+  config: any
+  secureUrl: string
+  transformationUrl: string
+  aspectRatio: string | undefined
+  prompt: string | undefined
+  color: string | undefined
+}
+
 declare type UpdateImageParams = {
-  image: {
-    _id: string
-    title: string
-    publicId: string
-    transformationType: string
-    width: number
-    height: number
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config: any
-    secureURL: string
-    transformationURL: string
-    aspectRatio: string | undefined
-    prompt: string | undefined
-    color: string | undefined
-  }
+  image: ImageType
   userId: string
   path: string
 }
@@ -162,7 +163,6 @@ declare type TransformationFormProps = {
 }
 
 declare type TransformedImageProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   image: any
   type: string
   title: string

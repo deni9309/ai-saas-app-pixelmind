@@ -9,24 +9,23 @@ import { handleError } from '@/lib/utils'
 /**
  * Creates a new user in the database.
  *
- * @param {CreateUserParams} user The user to create.
+ * @param user - The user to create with their respective properties.
  *
- * @returns {Promise<IUser | null>} A promise that resolves to the created user, or null if an error occurred.
+ * @returns The newly created user, or undefined if there was an error.
  */
-export async function createUser(user: CreateUserParams): Promise<IUser | null> {
+export async function createUser(user: CreateUserParams): Promise<IUser | undefined> {
   try {
     await connectToDatabase()
+
     const newUser = await User.create(user)
+    if (!newUser) throw new Error('User creation failed')
 
-    if (newUser) {
-      revalidatePath('/')
+    revalidatePath('/')
 
-      return new Promise<IUser>(JSON.parse(JSON.stringify(newUser)))
-    }
+    return new Promise<IUser>(JSON.parse(JSON.stringify(newUser)))
   } catch (error) {
     handleError(error)
   }
-  return null
 }
 
 /**
@@ -34,13 +33,13 @@ export async function createUser(user: CreateUserParams): Promise<IUser | null> 
  *
  * @param {string} userClerkId The Clerk ID of the user to find.
  *
- * @returns {Promise<IUser | null>} A promise that resolves to the found user, or null if the user was not found.
+ * @returns {Promise<IUser | undefined>} A promise that resolves to the found user, or undefined if the user was not found.
  */
-export async function getUserByClerkId(userClerkId: string): Promise<IUser | null> {
+export async function getUserByClerkId(userClerkId: string): Promise<IUser | undefined> {
   try {
     await connectToDatabase()
 
-    const user: IUser | null = await User.findOne({ clerkId: userClerkId })
+    const user = await User.findOne<IUser>({ clerkId: userClerkId })
 
     if (!user) throw new Error('User not found')
 
@@ -48,23 +47,25 @@ export async function getUserByClerkId(userClerkId: string): Promise<IUser | nul
   } catch (error) {
     handleError(error)
   }
-
-  return null
 }
 
 /**
  * Updates a user by their Clerk ID.
  *
  * @param {string} clerkId The Clerk ID of the user to update.
- * @param {UpdateUserParams} user The updated user info.
  *
- * @returns {Promise<IUser | null>} A promise that resolves to the updated user, or null if an error occurred.
+ * @param {UpdateUserParams} user The user data to update.
+ *
+ * @returns {Promise<IUser | undefined>} A promise that resolves to the updated user, or undefined if the user was not found.
  */
-export async function updateUser(clerkId: string, user: UpdateUserParams): Promise<IUser | null> {
+export async function updateUser(
+  clerkId: string,
+  user: UpdateUserParams,
+): Promise<IUser | undefined> {
   try {
     await connectToDatabase()
 
-    const updatedUser = await User.findOneAndUpdate({ clerkId }, user, { new: true })
+    const updatedUser = await User.findOneAndUpdate<IUser>({ clerkId }, user, { new: true })
 
     if (!updatedUser) throw new Error('User update failed')
 
@@ -73,7 +74,6 @@ export async function updateUser(clerkId: string, user: UpdateUserParams): Promi
   } catch (error) {
     handleError(error)
   }
-  return null
 }
 
 /**
@@ -81,25 +81,48 @@ export async function updateUser(clerkId: string, user: UpdateUserParams): Promi
  *
  * @param {string} clerkId The Clerk ID of the user to delete.
  *
- * @returns {Promise<IUser | null>} A promise that resolves to the deleted user, or null if the user was not found.
+ * @returns {Promise<IUser | undefined>} A promise that resolves to the deleted user, or undefined if the user was not found.
  */
-export async function deleteUser(clerkId: string): Promise<IUser | null> {
+export async function deleteUser(clerkId: string): Promise<IUser | undefined> {
   try {
     await connectToDatabase()
 
-    const userToDelete: IUser | null = await User.findOne({ clerkId })
-
+    const userToDelete = await User.findOne<IUser>({ clerkId })
     if (!userToDelete) throw new Error('User not found')
 
-    const deletedUser: IUser | null = await User.findByIdAndDelete(userToDelete._id)
+    const deletedUser = await User.findByIdAndDelete<IUser>(userToDelete._id)
+    if (!deletedUser) throw new Error('User delete failed')
 
-    if (deletedUser) {
-      revalidatePath('/')
+    revalidatePath('/')
 
-      return JSON.parse(JSON.stringify(deletedUser))
-    }
+    return JSON.parse(JSON.stringify(deletedUser))
   } catch (error) {
     handleError(error)
   }
-  return null
+}
+
+/**
+ * Updates a user's credits balance.
+ *
+ * @param {string} userId The ID of the user to update.
+ * @param {number} creditFee The amount of credits to add or subtract from the user's balance.
+ *
+ * @returns {Promise<IUser | undefined>} A promise that resolves to the updated user, or undefined if the user was not found.
+ */
+export async function updateCredits(userId: string, creditFee: number): Promise<IUser | undefined> {
+  try {
+    await connectToDatabase()
+
+    const updatedUserCredits = await User.findOneAndUpdate<IUser>(
+      { _id: userId },
+      { $inc: { creditBalance: creditFee } },
+      { new: true },
+    )
+
+    if (!updatedUserCredits) throw new Error('User update failed')
+
+    return JSON.parse(JSON.stringify(updatedUserCredits))
+  } catch (error) {
+    handleError(error)
+  }
 }

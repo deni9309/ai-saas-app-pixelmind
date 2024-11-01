@@ -19,9 +19,11 @@ import {
 } from '@/components/ui/select'
 import CustomInputField from '@/components/shared/custom-input-field'
 import MediaUploader from '@/components/shared/media-uploader'
+import TransformedImage from '@/components/shared/transformed-image'
 import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
-import { AspectRatioKey, AspectRatioType, debounce, deepMergeObjects } from '@/lib/utils'
+import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils'
 import { TransformationSchema } from '@/schemas/transformation.schema'
+import { updateCredits } from '@/lib/actions/user.actions'
 
 const TransformationForm = ({
   action,
@@ -40,7 +42,7 @@ const TransformationForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isTransforming, setIsTransforming] = useState(false)
   const [transformationConfig, setTransformationConfig] = useState(config)
-  
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isPending, startTransition] = useTransition()
 
@@ -67,10 +69,12 @@ const TransformationForm = ({
     setIsSubmitting(true)
 
     if (data || image) {
+      const getPublicId = image?.publicId ? image.publicId : (data?.publicId as string)
+
       const transformationUrl = getCldImageUrl({
         width: image?.width,
         height: image?.height,
-        src: image?.publicId,
+        src: getPublicId,
         ...transformationConfig,
       })
 
@@ -100,7 +104,8 @@ const TransformationForm = ({
   const onSelectFieldHandler = (value: string, onChangeField: (value: string) => void) => {
     const imageSize = aspectRatioOptions[value as AspectRatioKey]
 
-    setImage((prev: AspectRatioType) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setImage((prev: any) => ({
       ...prev,
       aspectRatio: imageSize.aspectRatio,
       width: imageSize.width,
@@ -132,7 +137,6 @@ const TransformationForm = ({
     return onChangeField(value)
   }
 
-  // Implement updateCredits function
   const onTransformHandler = async () => {
     setIsTransforming(true)
 
@@ -140,8 +144,9 @@ const TransformationForm = ({
 
     setNewTransformation(null)
 
+    // Update creditFee to something else if needed
     startTransition(async () => {
-      // await updateCredits(userId, creditFee)
+      await updateCredits(userId, -1)
     })
   }
 
@@ -235,6 +240,15 @@ const TransformationForm = ({
                 type={type}
               />
             )}
+          />
+
+          <TransformedImage
+            image={image}
+            title={form.getValues().title}
+            type={type}
+            isTransforming={isTransforming}
+            setIsTransforming={setIsTransforming}
+            transformationConfig={transformationConfig}
           />
         </div>
 
