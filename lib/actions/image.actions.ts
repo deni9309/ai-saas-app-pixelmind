@@ -8,27 +8,6 @@ import User, { IUser } from '@/lib/database/models/user.model'
 import Image, { IImage, IImageLean } from '../database/models/image.model'
 import { connectToDatabase } from '@/lib/database/mongoose'
 import { handleError } from '@/lib/utils'
-import { Query, Model, Document } from 'mongoose'
-
-/**
- * Populate a Mongoose query with a document from another model
- * @param {Query<any, any>} query - The Mongoose query to populate
- * @param {{ path: string; model: Model<Document>; select?: string }} options - Options for the populate function
- * @param {string} options.path - The path to populate in the queried documents
- * @param {Model<Document>} options.model - The Mongoose model of the documents to populate with
- * @param {string} [options.select] - The fields to select from the populated documents (default is all fields)
- * @returns {Query<any, any>} - The populated query
- */
-const populateDocument = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  query: Query<any, any>,
-  { path, model, select }: { path: string; model: Model<Document>; select?: string },
-) =>
-  query.populate({
-    path,
-    model,
-    select,
-  })
 
 /**
  * Creates a new image in the database.
@@ -131,7 +110,7 @@ export async function getImageById(imageId: string): Promise<IImage | undefined>
   try {
     await connectToDatabase()
 
-    const image: IImage | null = await populateDocument(Image.findById(imageId), {
+    const image: IImage | null = await Image.findById(imageId).populate({
       path: 'author',
       model: User,
       select: '_id firstName lastName clerkId',
@@ -224,14 +203,59 @@ export async function getAllImages({
     const queryTotalCount = await Image.find(query).countDocuments()
     const allTotalCount = await Image.find().countDocuments()
 
-    const data: IImage[] =
-      images && images.length > 0 ? JSON.parse(JSON.stringify(images as IImage[])) : []
+    const data: IImage[] = images && images.length > 0 ? JSON.parse(JSON.stringify(images)) : []
 
     return {
       data,
       totalPages: Math.ceil(queryTotalCount / limit),
       savedImages: allTotalCount,
     }
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+/**
+ * Retrieves a paginated list of images created by a specific user.
+ *
+ * @param {object} params - The parameters for querying user images.
+ * @param {number} [params.limit=9] - The number of images to return per page.
+ * @param {number} params.page - The page number to retrieve.
+ * @param {string} params.userId - The ID of the user whose images are to be retrieved.
+ *
+ * @returns {Promise<{ data: IImage[], totalPages: number } | undefined>} A promise that resolves to an object containing the user's images and the total number of pages, or undefined if an error occurs.
+ *
+ * @throws Will throw an error if there is a database connection issue or if the query fails.
+ */
+export async function getUserImages({
+  limit = 9,
+  page = 1,
+  userId,
+}: {
+  limit?: number
+  page: number
+  userId: string
+}): Promise<{ data: IImage[]; totalPages: number } | undefined> {
+  try {
+    await connectToDatabase()
+
+    const skipAmount = (Number(page) - 1) * limit
+
+    const images: IImage[] | null = await Image.find({ author: userId })
+      .populate({
+        path: 'author',
+        model: User,
+        select: '_id firstName lastName clerkId',
+      })
+      .sort({ createdAt: -1 })
+      .skip(skipAmount)
+      .limit(limit)
+
+    const totalImages = await Image.find({ author: userId }).countDocuments()
+
+    const data: IImage[] = images && images.length > 0 ? JSON.parse(JSON.stringify(images)) : []
+
+    return { data, totalPages: Math.ceil(totalImages / limit) }
   } catch (error) {
     handleError(error)
   }

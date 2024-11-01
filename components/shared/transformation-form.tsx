@@ -21,14 +21,14 @@ import CustomInputField from '@/components/shared/custom-input-field'
 import MediaUploader from '@/components/shared/media-uploader'
 import TransformedImage from '@/components/shared/transformed-image'
 import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
+import { updateCredits } from '@/lib/actions/user.actions'
+import { addImage, updateImage } from '@/lib/actions/image.actions'
 import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils'
 import { TransformationSchema } from '@/schemas/transformation.schema'
-import { updateCredits } from '@/lib/actions/user.actions'
 
 const TransformationForm = ({
   action,
   data = null,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   userId,
   type,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -46,7 +46,6 @@ const TransformationForm = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isPending, startTransition] = useTransition()
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter()
 
   const initialValues =
@@ -69,7 +68,7 @@ const TransformationForm = ({
     setIsSubmitting(true)
 
     if (data || image) {
-      const getPublicId = image?.publicId ? image.publicId : (data?.publicId as string)
+      const getPublicId: string = image?.publicId ? image.publicId : (data?.publicId as string)
 
       const transformationUrl = getCldImageUrl({
         width: image?.width,
@@ -78,7 +77,6 @@ const TransformationForm = ({
         ...transformationConfig,
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const imageData = {
         title: values.title,
         publicId: image?.publicId,
@@ -93,12 +91,41 @@ const TransformationForm = ({
         color: values.color,
       }
 
+      console.log({ imageData })
+
       if (action === 'Add') {
-        //  try {
-        //const newImage  =await addImage()
-        //  } catch (error) {}
+        try {
+          const newImage = await addImage({ image: imageData, userId, path: '/' })
+
+          if (newImage) {
+            form.reset()
+            setImage(data)
+
+            router.push(`/transformations/${newImage._id}`)
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+
+      if (action === 'Update') {
+        try {
+          const updatedImage = await updateImage({
+            image: { ...imageData, _id: data._id },
+            userId,
+            path: `/transformations/${data._id}`,
+          })
+
+          if (updatedImage) {
+            router.push(`/transformations/${updatedImage._id}`)
+          }
+        } catch (error) {
+          console.error(error)
+        }
       }
     }
+
+    setIsSubmitting(false)
   }
 
   const onSelectFieldHandler = (value: string, onChangeField: (value: string) => void) => {
