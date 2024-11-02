@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -18,9 +18,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import CustomInputField from '@/components/shared/custom-input-field'
+import InsufficientCreditsModal from '@/components/shared/insufficient-credits-modal'
 import MediaUploader from '@/components/shared/media-uploader'
 import TransformedImage from '@/components/shared/transformed-image'
-import { aspectRatioOptions, defaultValues, transformationTypes } from '@/constants'
+import { aspectRatioOptions, creditFee, defaultValues, transformationTypes } from '@/constants'
 import { updateCredits } from '@/lib/actions/user.actions'
 import { addImage, updateImage } from '@/lib/actions/image.actions'
 import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils'
@@ -31,7 +32,6 @@ const TransformationForm = ({
   data = null,
   userId,
   type,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   creditBalance,
   config = null,
 }: TransformationFormProps) => {
@@ -90,8 +90,6 @@ const TransformationForm = ({
         prompt: values.prompt,
         color: values.color,
       }
-
-      console.log({ imageData })
 
       if (action === 'Add') {
         try {
@@ -171,15 +169,21 @@ const TransformationForm = ({
 
     setNewTransformation(null)
 
-    // Update creditFee to something else if needed
     startTransition(async () => {
-      await updateCredits(userId, -1)
+      await updateCredits(userId, creditFee)
     })
   }
+
+  useEffect(() => {
+    if (image && (type === 'restore' || type === 'removeBackground')) {
+      setNewTransformation(transformationType.config)
+    }
+  }, [image, transformationType.config, type])
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {creditBalance < Math.abs(creditFee) && <InsufficientCreditsModal />}
         <CustomInputField
           control={form.control}
           render={({ field }) => <Input id={field.name} {...field} className="input-field" />}
