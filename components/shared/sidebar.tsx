@@ -65,7 +65,7 @@ const Sidebar = () => {
                       isActive ? 'bg-purple-gradient text-white' : 'text-gray-700',
                     )}
                   >
-                    <Link prefetch className="sidebar-link" href={link.route}>
+                    <Link prefetch={true} className="sidebar-link" href={link.route}>
                       <Image
                         src={link.icon}
                         alt="logo"

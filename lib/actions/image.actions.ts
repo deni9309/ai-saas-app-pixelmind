@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { v2 as cloudinary } from 'cloudinary'
+import { v2 as cloudinary, ResourceApiResponse } from 'cloudinary'
 
 import User, { IUser } from '@/lib/database/models/user.model'
 import Image, { IImage, IImageLean } from '../database/models/image.model'
@@ -147,7 +147,7 @@ export async function getImageById(imageId: string): Promise<IImage | undefined>
  * database error.
  */
 export async function getAllImages({
-  limit = 9,
+  limit = 1,
   page = 1,
   searchQuery = '',
 }: {
@@ -178,10 +178,11 @@ export async function getAllImages({
       expression += ` AND ${searchQuery}`
     }
 
-    const { resources } = await cloudinary.search.expression(expression).execute()
+    const { resources } = (await cloudinary.search
+      .expression(expression)
+      .execute()) as ResourceApiResponse
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const resourceIds = resources.map((resource: any) => resource.public_id)
+    const resourceIds = resources.map((resource) => resource.public_id)
 
     let query = {}
     if (searchQuery) {

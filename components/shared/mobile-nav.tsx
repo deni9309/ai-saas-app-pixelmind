@@ -72,7 +72,7 @@ const MobileNav = () => {
                           isActive && 'text-purple-500',
                         )}
                       >
-                        <Link prefetch className="sidebar-link_right" href={link.route}>
+                        <Link prefetch={true} className="sidebar-link_right" href={link.route}>
                           <Image
                             src={link.icon}
                             alt="logo"
