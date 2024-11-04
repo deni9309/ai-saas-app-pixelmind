@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from 'react'
 import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next-nprogress-bar'
 import { getCldImageUrl } from 'next-cloudinary'
 
 import { Button } from '@/components/ui/button'

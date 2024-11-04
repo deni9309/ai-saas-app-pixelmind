@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
+import { useRouter } from 'next-nprogress-bar'
 
 import { Input } from '@/components/ui/input'
 import { formUrlQuery, removeKeysFromQuery } from '@/lib/utils'
@@ -37,7 +38,13 @@ const Search = () => {
 
   return (
     <div className="search">
-      <Image src="/assets/icons/search.svg" alt="search" width={24} height={24} className='h-6 w-6' />
+      <Image
+        src="/assets/icons/search.svg"
+        alt="search"
+        width={24}
+        height={24}
+        className="h-6 w-6"
+      />
 
       <Input
         className="search-field"

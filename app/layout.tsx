@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 
 import './globals.css'
 import { cn } from '@/lib/utils'
+import RouterProgressProvider from '@/providers/RouterProgressProvider'
 
 const IBMPlex = IBM_Plex_Sans({
   subsets: ['latin'],
@@ -27,7 +28,9 @@ export default function RootLayout({
         <head>
           <link rel="icon" href="/favicon.svg" />
         </head>
-        <body className={cn('font-IBMPlex antialiased', IBMPlex.variable)}>{children}</body>
+        <body className={cn('font-IBMPlex antialiased', IBMPlex.variable)}>
+          <RouterProgressProvider>{children}</RouterProgressProvider>
+        </body>
       </html>
     </ClerkProvider>
   )

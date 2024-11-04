@@ -3,7 +3,8 @@
 import { CldImage } from 'next-cloudinary'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next-nprogress-bar'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -40,7 +41,7 @@ export const Collection = ({
       value: pageValue,
     })
 
-    router.push(newUrl, { scroll: false })
+    router.push(newUrl, { scroll: false }, { showProgressBar: true })
   }
 
   return (
@@ -48,7 +49,7 @@ export const Collection = ({
       <div className="collection-heading">
         <h2 className="h2-bold text-dark-600">Recent Edits</h2>
 
-         {hasSearch && <Search />}
+        {hasSearch && <Search />}
       </div>
 
       {images.length > 0 ? (
