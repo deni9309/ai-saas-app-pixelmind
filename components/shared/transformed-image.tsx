@@ -56,7 +56,9 @@ const TransformedImage = ({
                   />
                 </button>
               </TooltipTrigger>
-              <TooltipContent><p>Download</p></TooltipContent>
+              <TooltipContent>
+                <p>Download</p>
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         )}
@@ -79,7 +81,8 @@ const TransformedImage = ({
 
           {isTransforming && (
             <div className="transforming-loader">
-              <Image src="/assets/icons/spinner.svg" alt="transforming" width={50} height={50} />
+              <Image src="/assets/icons/spinner.svg" alt="spinner" width={50} height={50} />
+              <p className="text-white/80">Please wait...</p>
             </div>
           )}
         </div>
