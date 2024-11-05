@@ -13,6 +13,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
+import { TooltipProvider, TooltipTrigger, Tooltip, TooltipContent } from '@/components/ui/tooltip'
 import Search from '@/components/shared/search'
 import { transformationTypes } from '@/constants'
 import { IImage } from '@/lib/database/models/image.model'
@@ -109,12 +110,23 @@ const Card = ({ image }: { image: IImage }) => {
         />
         <div className="flex-between">
           <p className="p-20-semibold mr-3 line-clamp-1 text-dark-600">{image.title}</p>
-          <Image
-            src={`/assets/icons/${transformationTypes[image.transformationType as TransformationTypeKey].icon}`}
-            alt={image.title}
-            width={24}
-            height={24}
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Image
+                  src={`/assets/icons/${transformationTypes[image.transformationType as TransformationTypeKey].icon}`}
+                  alt={image.title}
+                  width={24}
+                  height={24}
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm capitalize text-dark-400">
+                  {transformationTypes[image.transformationType as TransformationTypeKey].title}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </Link>
     </li>

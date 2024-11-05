@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { CldImage, getCldImageUrl } from 'next-cloudinary'
 import { PlaceholderValue } from 'next/dist/shared/lib/get-img-props'
 
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { dataUrl, debounce, download, getImageSize } from '@/lib/utils'
 
 const TransformedImage = ({
@@ -42,15 +43,22 @@ const TransformedImage = ({
         <h3 className="h3-bold text-dark-600">Transformed</h3>
 
         {hasDownload && (
-          <button className="download-btn" onClick={(e) => downloadHandler(e)}>
-            <Image
-              src="/assets/icons/download.svg"
-              alt="download"
-              width={24}
-              height={24}
-              className="pb-[6px]"
-            />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="download-btn" onClick={(e) => downloadHandler(e)}>
+                  <Image
+                    src="/assets/icons/download.svg"
+                    alt="download"
+                    width={24}
+                    height={24}
+                    className="pb-[6px]"
+                  />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent><p>Download</p></TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
       </div>
 

@@ -16,6 +16,7 @@ const Home = async ({ searchParams }: SearchParamProps) => {
       <section className="home">
         <h1 className="home-heading">Unlock limitless creativity with PixelMind</h1>
         <p className="home-heading_p">AI-powered image generation for visionary minds</p>
+
         <ul className="flex-center w-full gap-20">
           {navLinks.slice(1, 5).map((link) => (
             <Link
