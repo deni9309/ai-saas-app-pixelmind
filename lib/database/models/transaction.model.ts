@@ -1,5 +1,4 @@
 import { Document, model, models, Schema } from 'mongoose'
-import { IUser } from './user.model'
 
 export interface ITransaction extends Document {
   createdAt: Date
@@ -7,7 +6,21 @@ export interface ITransaction extends Document {
   amount: number
   plan?: string
   credits: number
-  buyer: IUser
+  buyer: {
+    _id: string
+    firstName: string
+    lastName: string
+    clerkId: string
+  }
+}
+
+export interface ITransactionLean extends Document {
+  createdAt: Date
+  stripeId: string
+  amount: number
+  plan?: string
+  credits: number
+  buyer: string
 }
 
 const TransactionSchema = new Schema({
