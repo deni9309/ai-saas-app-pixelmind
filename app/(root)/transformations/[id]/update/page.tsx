@@ -22,7 +22,7 @@ const UpdateImagePage = async ({ params: { id } }: SearchParamProps) => {
   return (
     <>
       <Header title={transformation.title} subtitle={transformation.subtitle} />
-      
+
       <section className="mt-10">
         <TransformationForm
           action="Update"
